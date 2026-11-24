@@ -188,44 +188,7 @@ class AuthController extends Controller
     // Method to import datasheet (CSV/Excel) to database
     public function importDatasheet(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:csv,txt'
-        ]);
-
-        $file = $request->file('file');
-        $path = $file->getRealPath();
-
-        if (($handle = fopen($path, 'r')) !== FALSE) {
-            $header = fgetcsv($handle, 1000, ','); // Get header row
-            $imported = 0;
-            $errors = [];
-
-            while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-                try {
-                    $row = array_combine($header, $data);
-
-                    PreRegisteredUser::updateOrCreate(
-                        ['Email' => $row['email']],
-                        [
-                            'Your Position' => $row['position'],
-                            'DEPARTMENT' => $row['department'],
-                            'Layer' => $row['layer']
-                        ]
-                    );
-                    $imported++;
-                } catch (Exception $e) {
-                    $errors[] = "Error importing row: " . implode(',', $data) . " - " . $e->getMessage();
-                }
-            }
-            fclose($handle);
-
-            return response()->json([
-                'message' => "Successfully imported {$imported} records.",
-                'errors' => $errors
-            ]);
-        }
-
-        return response()->json(['message' => 'Failed to read file.'], 400);
+        return app(AdminController::class)->importPreRegisteredUsers($request);
     }
 
     public function changeEmail(Request $request)

@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PreRegisteredUser;
 use App\Models\User;
+use App\Imports\PreRegisteredUsersImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
@@ -172,6 +176,48 @@ public function destroy($id)
     ]);
 }
 
+    /**
+     * Import pre-registered users / invitations in bulk via Excel or CSV file.
+     * Prevents duplicate invitations in file, updates or skips existing invitations,
+     * and avoids duplicating already registered users.
+     */
+    public function importPreRegisteredUsers(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:20480',
+            'update_existing' => 'sometimes|boolean',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $file = $request->file('file');
+            $updateExisting = $request->has('update_existing')
+                ? filter_var($request->input('update_existing'), FILTER_VALIDATE_BOOLEAN)
+                : true;
+
+            $import = new PreRegisteredUsersImport($updateExisting);
+            Excel::import($import, $file);
+
+            return response()->json([
+                'message' => 'User invitations imported successfully.',
+                'summary' => $import->getSummary(),
+                'errors' => $import->getErrors(),
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('Failed to import user invitations: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to process file: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
 
 }

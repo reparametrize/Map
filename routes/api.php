@@ -25,7 +25,8 @@ Route::get('/public/locations/nearby-hex', [LocationController::class, 'nearbyBy
 
 // Admin-only routes
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::post('/admin/import-datasheet', [AuthController::class, 'importDatasheet']);
+    Route::post('/admin/import-datasheet', [AdminController::class, 'importPreRegisteredUsers']);
+    Route::post('/admin/users/import', [AdminController::class, 'importPreRegisteredUsers']);
     Route::get('/users', [AdminController::class, 'index']);      // عرض المستخدمين مع pagination + search
     Route::post('/users', [AdminController::class, 'store']);     // إنشاء مستخدم جديد
     Route::put('/users/{id}', [AdminController::class, 'update']); // تعديل مستخدم

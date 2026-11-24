@@ -4522,6 +4522,120 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Import Users Invitations (Excel/CSV)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Excel file (.xlsx, .xls) or CSV file with user invitations (matching pre_registered_users structure)"
+                },
+                {
+                  "key": "update_existing",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Optional boolean (default: true). Updates existing invitations in pre_registered_users if true, skips if false."
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/users/import",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "import"
+              ]
+            },
+            "description": "رفع ملف إكسل أو CSV لدعوات المستخدمين وإضافتهم دفعة واحدة بدون تكرار (يتوفر أيضاً المسار البديل: /api/admin/import-datasheet)"
+          },
+          "response": [
+            {
+              "name": "Successful Import Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file"
+                    },
+                    {
+                      "key": "update_existing",
+                      "value": "true",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/api/admin/users/import",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "api",
+                    "admin",
+                    "users",
+                    "import"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"User invitations imported successfully.\",\n    \"summary\": {\n        \"total_rows\": 438,\n        \"imported\": 437,\n        \"updated\": 0,\n        \"already_registered\": 0,\n        \"duplicates_in_file\": 0,\n        \"skipped_invalid\": 1\n    },\n    \"errors\": [\n        \"Row 60: Invalid email format (omer.kartal1187gmail.com)\"\n    ]\n}"
+            }
+          ]
         }
       ]
     }
